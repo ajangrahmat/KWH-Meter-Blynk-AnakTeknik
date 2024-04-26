@@ -18,8 +18,11 @@ PZEM004Tv30 pzem(D3, D4);
 unsigned const long interval = 1000L;
 unsigned long zero = 0;
 
+const byte relay = D1;
+
 void setup() {
   Serial.begin(115200);
+  pinMode(relay, OUTPUT);
   setBrightness(5);
   //  pzem.resetEnergy();
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
@@ -42,6 +45,12 @@ void loop() {
   viewEnergy(energy);
   viewFrequency(frequency);
   viewPowerFactor(powerFactor);
+
+  if (power > 100) {
+    Serial.println("Power Melebihi Batas");
+    Blynk.logEvent("power_berlebih");
+    digitalWrite(relay, HIGH);
+  }
 
   if (millis() - zero >= interval) {
     zero = millis();
